@@ -12,7 +12,7 @@ main(P) ->
     {ok, Files} = file:list_dir(Absdir),
     Matched = lists:filter(fun(Name) ->
                             case re:run(Name, For, [caseless]) of
-                              {match, _} -> true;
+                              {match, _} -> filelib:is_dir(Absdir ++ "/" ++ Name);
                               _ -> false
                             end
                           end, Files),
