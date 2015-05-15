@@ -5,6 +5,7 @@
 This script is like `cd` with smart completion.
 
 It does fuzzy(regular expression) search for the name you want in directories you specify. If there's a single match, it will go to that directory directly, if there are several directories, it will prompt to ask a number to choose.
+
 ![demo](./demo.png?raw=true)
 
 ---
