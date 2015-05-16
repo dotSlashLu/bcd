@@ -3,21 +3,34 @@
 main(P) ->
   [For|L] = P,
   {ok, Cwd} = file:get_cwd(),
-  Matches = flatten(lists:map(fun(Dir) ->
-    Absdir = case Dir of
-      "" -> Cwd;
-      [$/|_] -> Dir;
-      _ -> Cwd ++ [$/] ++ Dir
-    end,
-    {ok, Files} = file:list_dir(Absdir),
-    Matched = lists:filter(fun(Name) ->
-                            case re:run(Name, For, [caseless]) of
-                              {match, _} -> filelib:is_dir(Absdir ++ "/" ++ Name);
-                              _ -> false
-                            end
-                          end, Files),
-    [Absdir ++ [$/] ++ File || File <- Matched]
-  end,
+  Matches = flatten(
+    lists:map(
+      fun(Dir) ->
+        Absdir = case Dir of
+          "" -> Cwd;
+          [$/|_] -> Dir;
+          _ -> Cwd ++ "/" ++ Dir
+        end,
+        case file:list_dir(Absdir) of
+          {error, Why} ->
+            if
+              Why == enoent ->
+                io:fwrite(standard_error, "Error: ~s doesn't exist~n", [Dir]);
+              true -> void
+            end,
+            error(Why);
+
+          {ok, Files} ->
+            Matched = lists:filter(
+              fun(Name) ->
+                case re:run(Name, For, [caseless]) of
+                  {match, _} -> filelib:is_dir(Absdir ++ "/" ++ Name);
+                  _ -> false
+                end
+              end, Files),
+            [Absdir ++ "/" ++ File || File <- Matched]
+        end
+      end,
   L)),
   case Matches of
     [] ->
