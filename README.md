@@ -18,13 +18,12 @@ It does fuzzy(regular expression) search for the name you want in directories yo
 ```shell
 # or any name you like
 bcd() {
-  dirs="$HOME $HOME/projects $HOME/work";
-  # change this to directories you want to search from
-  scriptdir="$HOME/bcd"
   # change this to where main.erl is located
+  scriptdir="$HOME/bcd"
 
   if [ $1 ]; then
-    dir=`$scriptdir/main.erl $1 $PWD $dirs`
+    # change arguments from $PWD to the end to the directories you want to search from
+    dir=`$scriptdir/main.erl $1 $PWD $HOME $HOME/projects $HOME/work`
     if [ -d "$dir" ]; then
       cd $dir;
     fi

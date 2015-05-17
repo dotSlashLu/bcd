@@ -15,7 +15,7 @@ main(P) ->
           {error, Why} ->
             if
               Why == enoent ->
-                io:fwrite(standard_error, "Error: ~s doesn't exist~n", [Dir]);
+                io:fwrite(standard_error, "Error: target dir ~s doesn't exist~n", [Dir]);
               true -> void
             end,
             error(Why);
@@ -32,18 +32,20 @@ main(P) ->
         end
       end,
   L)),
-  case Matches of
+  UniqMatches = sets:to_list(sets:from_list(Matches)),
+  case UniqMatches of
     [] ->
-      io:fwrite(standard_error, "No pattern ~s match in ~p~n", [For, L]);
+      io:fwrite(standard_error, "No pattern ~s matched in ~p~n", [For, L]);
     _ ->
-      MatchedLen = length(Matches),
+      MatchedLen = length(UniqMatches),
       case MatchedLen of
         1 ->
-          io:format("~s~n", [lists:nth(1, Matches)]);
+          io:format("~s~n", [lists:nth(1, UniqMatches)]);
         _ ->
-          [io:fwrite(standard_error, "~p. ~s~n", [I, lists:nth(I, Matches)]) || I <- lists:seq(1, MatchedLen)],
+          [io:fwrite(standard_error, "~p. ~s~n", [I, lists:nth(I, UniqMatches)]) ||
+            I <- lists:seq(1, MatchedLen)],
           {ok, [Selected]} = io:fread("", "~d"),
-          io:format("~s~n", [lists:nth(Selected, Matches)])
+          io:format("~s~n", [lists:nth(Selected, UniqMatches)])
       end
   end.
 
